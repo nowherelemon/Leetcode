@@ -1,0 +1,65 @@
+/*
+There are a total of n courses you have to take, labeled from 0 to n-1.
+
+Some courses may have prerequisites, for example to take course 0 you have to first take course 1, which is expressed as a pair: [0,1]
+
+Given the total number of courses and a list of prerequisite pairs, return the ordering of courses you should take to finish all courses.
+
+There may be multiple correct orders, you just need to return one of them. If it is impossible to finish all courses, return an empty array.
+*/
+
+
+
+//dfs
+
+
+
+class Solution {
+    public int[] findOrder(int numCourses, int[][] prerequisites) {
+        Map<Integer, Set<Integer>> map = new HashMap<> ();
+        
+        for (int[] pre : prerequisites) {
+            Set<Integer> set = map.getOrDefault(pre[0], new HashSet<> ());
+            
+            set.add(pre[1]);
+            
+            map.put(pre[0], set);
+        }
+        
+        boolean[] visited = new boolean[numCourses];
+        int[] index = new int[1];
+        int[] res = new int[numCourses];
+        for (int key : map.keySet()) {
+            boolean[] round = new boolean[numCourses];
+             if (!dfs(map, visited, round, key, index, res)) {
+                 return new int[0];
+             }
+        }
+        
+        for (int i = 0; i < numCourses; i++) {
+            if (!visited[i]) {
+                res[index[0]++] = i;
+            }
+        }
+        return res;
+    }
+    
+    private boolean dfs(Map<Integer, Set<Integer>> map, boolean[] visited, boolean[] round, int start, int[] index, int[] res) {
+        System.out.println(start);
+        if (round[start]) return false;
+        if (visited[start]) return true;
+        
+        visited[start] = round[start] = true;
+        
+        if (map.containsKey(start)) {
+            for (int next : map.get(start)) {
+                if (!dfs(map, visited, round, next, index, res)) {
+                    return false;
+                }
+            }
+        }
+        res[index[0]++] = start;
+        round[start] = false;
+        return true;
+    }
+}
